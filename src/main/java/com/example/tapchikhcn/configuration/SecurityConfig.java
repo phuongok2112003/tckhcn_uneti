@@ -1,55 +1,104 @@
 package com.example.tapchikhcn.configuration;
 
+
+import com.example.tapchikhcn.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
+import java.util.List;
 
 @Configuration
+@EnableWebMvc
 @EnableWebSecurity
-@EnableMethodSecurity
-public class SecurityConfig {
-
-    @Value("${jwt.signerkey}")
-    private String  signerKey;
-    private final String[] PUBLIC_ENDPOINT = {
-            "/login",
-            "/oauth/logout",
-            "/oauth/refresh",
-            "/oauth/token"
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Value("${endpoints.cors.allowed-headers: Authorization, Content-Type}")
+    String allowedHeaders;
+    @Value("${endpoints.cors.allowed-methods: POST, PUT, GET, OPTIONS, DELETE}")
+    List<String> allowedMethods;
+    @Value("${endpoints.cors.allowed-origins: *}")
+    String allowedOrigins;
+    @Value("${endpoints.cors.allowed-credentials: true}")
+    boolean allowedCredentials;
+    @Value("${endpoints.cors.max-age: 36000}")
+    long maxAge;
+    private final UserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtTokenBlacklist tokenBlacklist;
+    private final UserService userService;
+    private static final String[] PUBLIC_URLS = {
+            "/api/**",
+            "/v2/api-docs",
+            "/configuration/ui",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/webjars/**"
     };
 
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authenticationProvider());
+    }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        Config endpoid
-        http.authorizeHttpRequests(request -> request.antMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll().anyRequest().authenticated());
-//        Tránh tấn công cross site
-        http.csrf(AbstractHttpConfigurer::disable);
-//        Config oauth2
-        http.oauth2ResourceServer(oauth -> oauth.jwt(jwtSecret -> jwtSecret.decoder(jwtDecoder())));
-        return http.build();
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.cors().configurationSource(corsConfigurationSource());
+        http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests().antMatchers(PUBLIC_URLS).permitAll();
+        http.authorizeRequests().anyRequest().authenticated();
+        http.addFilterBefore(new CustomAuthorizationFilter(tokenBlacklist), UsernamePasswordAuthenticationFilter.class);
+
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(userService));
+        customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(userService));
+        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        http.addFilter(customAuthenticationFilter);
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
-
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512" );
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec).macAlgorithm(MacAlgorithm.HS512).build();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin(allowedOrigins);
+        allowedMethods.forEach(configuration::addAllowedMethod);
+        configuration.addAllowedHeader(allowedHeaders);
+        configuration.setAllowCredentials(allowedCredentials);
+        configuration.setMaxAge(maxAge);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(bCryptPasswordEncoder);
+
+        return provider;
+    }
 }

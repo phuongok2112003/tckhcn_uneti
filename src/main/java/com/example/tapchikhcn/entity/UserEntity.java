@@ -5,9 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class UserEntity {
+public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -33,6 +37,7 @@ public class UserEntity {
     private String password;
 
     @Column(name = "permission", nullable = false)
+
     private String permission ;
 
     @Column(name = "verify_token", length = 191)
@@ -65,5 +70,55 @@ public class UserEntity {
 
     public void setPermission(UserPermision permission) {
         this.permission = permission.toString();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Tạo một tập hợp các đối tượng GrantedAuthority
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        // Chuyển đổi chuỗi quyền thành các đối tượng GrantedAuthority
+        authorities.add(() -> permission);
+
+        return authorities;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", permission='" + permission + '\'' +
+                ", verifyToken='" + verifyToken + '\'' +
+                ", isActive=" + isActive +
+                ", forgotToken='" + forgotToken + '\'' +
+                ", forgotTokenExpire=" + forgotTokenExpire +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", posts=" + posts +
+                ", comments=" + comments +
+                '}';
     }
 }
