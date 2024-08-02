@@ -34,6 +34,6 @@ public class FileEntity {
     private Date createdAt;
 
     @Column(name = "cat_id")
-    private Integer catId;
+    private int catId;
 
 }

@@ -16,5 +16,5 @@ public class CategoryResponseDto {
     private String name;
     private Date updateAt;
     private String codeName;
-    private Integer type;
+    private int type;
 }

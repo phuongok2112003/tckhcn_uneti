@@ -16,5 +16,5 @@ public class FileResponseDto {
     private String file;
     private PostResponseDto post;
     private Date createdAt;
-    private Integer catId;
+    private int catId;
 }

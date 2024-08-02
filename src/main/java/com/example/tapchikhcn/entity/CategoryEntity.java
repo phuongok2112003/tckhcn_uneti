@@ -34,7 +34,7 @@ public class CategoryEntity {
     private String codeName;
 
     @Column(name = "type")
-    private Integer type;
+    private int type;
 
     @OneToMany(mappedBy = "category")
     private Set<PostEntity> posts;
