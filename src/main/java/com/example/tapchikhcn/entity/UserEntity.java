@@ -37,8 +37,8 @@ public class UserEntity implements UserDetails {
     private String password;
 
     @Column(name = "permission", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Set<UserPermision> permission ;
+
+    private String permission ;
 
     @Column(name = "verify_token", length = 191)
     private String verifyToken;
@@ -64,9 +64,23 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private Set<CommentEntity> comments;
 
+    public UserPermision getPermission() {
+        return UserPermision.parseByCode(permission);
+    }
+
+    public void setPermission(UserPermision permission) {
+        this.permission = permission.toString();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<GrantedAuthority>(this.permission);
+        // Tạo một tập hợp các đối tượng GrantedAuthority
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        // Chuyển đổi chuỗi quyền thành các đối tượng GrantedAuthority
+        authorities.add(() -> permission);
+
+        return authorities;
     }
 
     @Override
@@ -87,5 +101,24 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return isActive;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", permission='" + permission + '\'' +
+                ", verifyToken='" + verifyToken + '\'' +
+                ", isActive=" + isActive +
+                ", forgotToken='" + forgotToken + '\'' +
+                ", forgotTokenExpire=" + forgotTokenExpire +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", posts=" + posts +
+                ", comments=" + comments +
+                '}';
     }
 }
