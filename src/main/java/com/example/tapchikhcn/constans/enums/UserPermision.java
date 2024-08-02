@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-public enum UserPermision {
+public enum UserPermision implements GrantedAuthority {
     USER("user"),
     ADMIN("admin");
 
@@ -31,6 +32,11 @@ public enum UserPermision {
     }
     @Override
     public String toString() {
+        return this.name;
+    }
+
+    @Override
+    public String getAuthority() {
         return this.name;
     }
 }

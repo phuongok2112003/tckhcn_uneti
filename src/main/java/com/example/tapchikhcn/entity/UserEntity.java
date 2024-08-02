@@ -5,9 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class UserEntity {
+public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -33,7 +37,8 @@ public class UserEntity {
     private String password;
 
     @Column(name = "permission", nullable = false)
-    private String permission ;
+    @Enumerated(EnumType.STRING)
+    private Set<UserPermision> permission ;
 
     @Column(name = "verify_token", length = 191)
     private String verifyToken;
@@ -59,11 +64,28 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private Set<CommentEntity> comments;
 
-    public UserPermision getPermission() {
-        return UserPermision.parseByCode(permission);
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new HashSet<GrantedAuthority>(this.permission);
     }
 
-    public void setPermission(UserPermision permission) {
-        this.permission = permission.toString();
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
     }
 }
