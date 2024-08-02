@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.entity;
 
+import com.example.tapchikhcn.constans.enums.UserPermision;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,8 @@ public class UserEntity {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "permission", nullable = false, columnDefinition = "ENUM('user','admin')")
-    private String permission = "user";
+    @Column(name = "permission", nullable = false)
+    private String permission ;
 
     @Column(name = "verify_token", length = 191)
     private String verifyToken;
@@ -58,5 +59,11 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private Set<CommentEntity> comments;
 
+    public UserPermision getPermission() {
+        return UserPermision.parseByCode(permission);
+    }
 
+    public void setPermission(UserPermision permission) {
+        this.permission = permission.toString();
+    }
 }

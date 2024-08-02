@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.entity;
 
+import com.example.tapchikhcn.constans.enums.Comentstatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class CommentEntity {
     @JoinColumn(name = "post_id")
     private PostEntity post;
 
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('unseen','seen','approved')")
+    @Column(name = "status", nullable = false)
     private String status = "unseen";
 
     @Column(name = "created_at", nullable = false)
@@ -41,4 +42,11 @@ public class CommentEntity {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    public Comentstatus getStatus() {
+        return Comentstatus.parseByCode(status);
+    }
+
+    public void setStatus(Comentstatus status) {
+        this.status =status.toString() ;
+    }
 }

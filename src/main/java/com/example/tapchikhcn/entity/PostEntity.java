@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.entity;
 
+import com.example.tapchikhcn.constans.enums.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,7 @@ public class PostEntity {
     @Column(name = "image", nullable = false, length = 200)
     private String image;
 
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('disable','enable')")
+    @Column(name = "status", nullable = false)
     private String status = "disable";
 
     @Column(name = "selected", nullable = false)
@@ -78,5 +79,11 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private Set<FileEntity> files;
 
+    public PostStatus getStatus() {
+        return PostStatus.parseByCode(status);
+    }
 
+    public void setStatus(PostStatus status) {
+        this.status = status.toString();
+    }
 }
