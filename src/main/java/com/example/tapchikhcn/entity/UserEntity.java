@@ -6,13 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -25,7 +23,7 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private int  id;
 
     @Column(name = "username", nullable = false, length = 100)
     private String username;
@@ -75,12 +73,12 @@ public class UserEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Tạo một tập hợp các đối tượng GrantedAuthority
-        Set<GrantedAuthority> authorities = new HashSet<>();
+//        Set<GrantedAuthority> authorities = new HashSet<>();
+//
+//        // Chuyển đổi chuỗi quyền thành các đối tượng GrantedAuthority
+//        authorities.add(() -> permission);
 
-        // Chuyển đổi chuỗi quyền thành các đối tượng GrantedAuthority
-        authorities.add(() -> permission);
-
-        return authorities;
+        return  Collections.singletonList(new SimpleGrantedAuthority(permission));
     }
 
     @Override
