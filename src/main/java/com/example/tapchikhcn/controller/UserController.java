@@ -42,6 +42,7 @@ public class UserController {
         userService.logout(request);
         return true;
     }
+    @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
     public UserResponseDto update(@PathVariable int id,@RequestBody @NonNull UserRequestDto userDto) {
 
