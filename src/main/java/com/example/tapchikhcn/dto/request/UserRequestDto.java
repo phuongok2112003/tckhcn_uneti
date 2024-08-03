@@ -19,9 +19,9 @@ public class UserRequestDto {
     private String username;
     private String email;
     private String password;
-    private String permission = "user";
+    private String permission ;
     private String verifyToken;
-    private boolean isActive = false;
+    private boolean isActive ;
     private String forgotToken;
     private Date forgotTokenExpire;
     private Date createdAt;

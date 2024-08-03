@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.services.Impl;
 
+import com.example.tapchikhcn.dto.response.PostResponseDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
 import com.example.tapchikhcn.entity.UserEntity;
 import com.example.tapchikhcn.error.CommonStatus;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 public class UserServiceImpl implements UserService , UserDetailsService {
 
     private final UserRepository userRepository;
-//    private final UserMapper userMapper;
+    private final UserMapper userMapper;
     @Override
     public UserEntity getUserByUsername(String username) {
         if (!StringUtils.hasText(username))
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
 
-        return null;
+        return this.entityToDto(user);
     }
 
     @Override
@@ -63,5 +64,49 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 
 
         return user;
+    }
+    public UserResponseDto entityToDto(UserEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        UserResponseDto dto = new UserResponseDto();
+        dto.setUsername(entity.getUsername());
+        dto.setEmail(entity.getEmail());
+        dto.setPassword(null); // Để bỏ qua trường password
+        dto.setPermission(entity.getPermission().toString());
+        dto.setVerifyToken(entity.getVerifyToken());
+        dto.setActive(entity.isActive());
+        dto.setForgotToken(entity.getForgotToken());
+        dto.setForgotTokenExpire(entity.getForgotTokenExpire());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+
+        // Mapping các bài viết (posts)
+//        if (entity.getPosts() != null) {
+//            dto.setPosts(entity.getPosts().stream()
+//                    .map(post -> {
+//                        PostResponseDto postDto = new PostResponseDto();
+//                        postDto.setTitle(post.getTitle());
+//                        postDto.setContent(post.getContent());
+//                        // Thêm các trường khác nếu có
+//                        return postDto;
+//                    })
+//                    .collect(Collectors.toList()));
+//        }
+//
+//        // Mapping các bình luận (comments)
+//        if (entity.getComments() != null) {
+//            dto.setComments(entity.getComments().stream()
+//                    .map(comment -> {
+//                        CommentResponseDto commentDto = new CommentResponseDto();
+//                        commentDto.setText(comment.getText());
+//                        // Thêm các trường khác nếu có
+//                        return commentDto;
+//                    })
+//                    .collect(Collectors.toList()));
+//        }
+
+        return dto;
     }
 }
