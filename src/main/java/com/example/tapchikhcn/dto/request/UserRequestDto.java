@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.dto.request;
 
+import com.example.tapchikhcn.constans.enums.UserPermision;
 import com.example.tapchikhcn.dto.response.CommentResponseDto;
 import com.example.tapchikhcn.dto.response.PostResponseDto;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class UserRequestDto {
     private String username;
     private String email;
     private String password;
-    private String permission ;
+    private UserPermision permission ;
     private String verifyToken;
     private boolean isActive ;
     private String forgotToken;
