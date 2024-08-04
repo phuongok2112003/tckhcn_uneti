@@ -2,9 +2,13 @@ package com.example.tapchikhcn.controller;
 
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
+import com.example.tapchikhcn.dto.search.EntiySearch;
 import com.example.tapchikhcn.services.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
     private final UserService userService;
 
-    @PreAuthorize("hasAuthority('admin')")
+  @PostAuthorize("returnObject.username == authentication.name or hasAuthority('admin')")
     @GetMapping("/{username}")
     public UserResponseDto getByUsername(@PathVariable("username") String username) {
         return userService.getUserDtoByUsername(username);
@@ -47,6 +52,12 @@ public class UserController {
     public UserResponseDto update(@PathVariable int id,@RequestBody @NonNull UserRequestDto userDto) {
 
         return userService.update(id,userDto);
+    }
+    @PreAuthorize("hasAuthority('admin')")
+    @GetMapping("/search")
+    public Page<UserResponseDto> searh(EntiySearch search) {
+
+        return userService.searchBy(search);
     }
 
 

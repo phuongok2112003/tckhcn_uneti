@@ -72,12 +72,6 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Tạo một tập hợp các đối tượng GrantedAuthority
-//        Set<GrantedAuthority> authorities = new HashSet<>();
-//
-//        // Chuyển đổi chuỗi quyền thành các đối tượng GrantedAuthority
-//        authorities.add(() -> permission);
-
         return  Collections.singletonList(new SimpleGrantedAuthority(permission));
     }
 
