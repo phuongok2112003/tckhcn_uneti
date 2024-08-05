@@ -30,7 +30,4 @@ public class PostResponseDto
     private Date updatedAt;
     private String authorName;
     private String file;
-    private List<CommentResponseDto> comments;
-    private List<BannerResponseDto> banners;
-    private List<FileResponseDto> files;
 }

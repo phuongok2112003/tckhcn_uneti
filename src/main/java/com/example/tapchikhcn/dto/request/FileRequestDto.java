@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,8 @@ public class FileRequestDto {
     private int id;
     private String name;
     private String file;
-    private PostRequestDto post;
+    private int post;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
-    private Integer catId;
+    private int catId;
 }

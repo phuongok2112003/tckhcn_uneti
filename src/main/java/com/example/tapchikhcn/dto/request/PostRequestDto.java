@@ -30,7 +30,4 @@ public class PostRequestDto {
     private Date updatedAt;
     private String authorName;
     private String file;
-    private List<CommentRequestDto> comments;
-    private List<BannerRequestDto> banners;
-    private List<FileRequestDto> files;
 }
