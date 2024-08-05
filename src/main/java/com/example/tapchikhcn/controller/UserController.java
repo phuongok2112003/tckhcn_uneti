@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.controller;
 
+import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
 import com.example.tapchikhcn.dto.search.EntiySearch;
@@ -66,6 +67,10 @@ public class UserController {
     @PostMapping("/forgot")
     public String forgotPassword(@RequestParam String email) {
         return userService.sendPasswordResetCode(email);
+    }
+    @PostMapping("/resetPasword")
+    public void forgotPassword(@RequestBody PasswordResetRequest request) {
+        userService.verifyPasswordResetCode(request);
     }
 
 

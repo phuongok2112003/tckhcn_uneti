@@ -46,6 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private static final String[] PUBLIC_URLS = {
             "/api/**",
+            "/user/forgot",
+            "/user",
+            "/user/resetPasword",
             "/v2/api-docs",
             "/configuration/ui",
             "/swagger-resources/**",

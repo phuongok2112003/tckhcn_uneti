@@ -1,16 +1,17 @@
 package com.example.tapchikhcn.utils;
 
+import java.util.Random;
+
 public class RenderCodeTest {
     public static String setValue(){
-        int stringLength = 4;
-        String alphaNumericString = "0123456789";
-        StringBuilder sb = new StringBuilder(stringLength);
+        int length = 4;
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
 
-        for (int i = 0; i < stringLength; i++) {
-            int index = (int)(alphaNumericString.length() * Math.random());
-            sb.append(alphaNumericString.charAt(index));
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10));  // Số ngẫu nhiên từ 0 đến 9
         }
 
-        return sb.toString();
+        return code.toString();
     }
 }

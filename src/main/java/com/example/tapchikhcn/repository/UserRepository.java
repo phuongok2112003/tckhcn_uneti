@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer > {
     UserEntity findByUsername(String username);
+    UserEntity findByEmail(String email);
 
 
 }
