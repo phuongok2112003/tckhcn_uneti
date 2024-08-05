@@ -1,7 +1,13 @@
 package com.example.tapchikhcn.services.Impl;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.tapchikhcn.configuration.JwtTokenBlacklist;
 import com.example.tapchikhcn.constans.MessageCodes;
+import com.example.tapchikhcn.constans.enums.Variables;
+import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
 import com.example.tapchikhcn.dto.search.EntiySearch;
@@ -9,10 +15,12 @@ import com.example.tapchikhcn.entity.UserEntity;
 import com.example.tapchikhcn.error.CommonStatus;
 import com.example.tapchikhcn.error.UserStatus;
 import com.example.tapchikhcn.exceptions.EOException;
+import com.example.tapchikhcn.services.EmailService;
 import com.example.tapchikhcn.services.mapper.UserMapper;
 import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.UserService;
 import com.example.tapchikhcn.utils.EbsSecurityUtils;
+import com.example.tapchikhcn.utils.EbsTokenUtils;
 import com.example.tapchikhcn.utils.PageUtils;
 import com.example.tapchikhcn.utils.RenderCodeTest;
 import lombok.AllArgsConstructor;
@@ -37,10 +45,12 @@ import org.springframework.web.servlet.function.EntityResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.parser.Entity;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.example.tapchikhcn.constans.ErrorCodes.ENTITY_NOT_FOUND;
+import static com.example.tapchikhcn.constans.ErrorCodes.ERROR_CODE;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +61,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     private final UserMapper userMapper;
     private final JwtTokenBlacklist tokenBlacklist;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailService emailService;
     @Override
     public UserResponseDto getUserDtoByUsername(String username) {
         UserEntity user = userRepository.findByUsername(EbsSecurityUtils.getUsername());
@@ -90,8 +101,31 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     @Override
     public String sendPasswordResetCode(String email) {
         String code= RenderCodeTest.setValue();
-
+        UserEntity user=userRepository.findByEmail(email);
+        user.setForgotToken(EbsTokenUtils.createCode(code,email));
+        userRepository.save(user);
+        emailService.sendEmail(email,"Password Reset Request",code);
         return code;
+    }
+
+    @Override
+    public void verifyPasswordResetCode(PasswordResetRequest passwordResetRequest) {
+        UserEntity user=userRepository.findByEmail(passwordResetRequest.getEmail());
+        Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(user.getForgotToken());
+
+        String emailVerify = decodedJWT.getSubject();
+        String codeVerify = decodedJWT.getClaim("code").asString();
+        String pasword1=passwordResetRequest.getPassword();
+        String pasword2=passwordResetRequest.getPassword2();
+        if(emailVerify.equals(passwordResetRequest.getEmail())&&codeVerify.equals(passwordResetRequest.getCode())&&pasword1.equals(pasword2)){
+          user.setPassword(bCryptPasswordEncoder.encode(pasword1));
+          userRepository.save(user);
+        }
+        else throw new EOException(ERROR_CODE,
+                MessageCodes.USER_NOT_VERIFY,emailVerify);
+
     }
 
     @Override
@@ -125,7 +159,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         this.validateDto(dto);
 
         UserEntity user = new UserEntity();
-        user= this.dtoToEntiy(dto);
+     this.dtoToEntiy(dto,user);
         user = userRepository.save(user);
         return entityToDto(user);
 
@@ -135,7 +169,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     public UserResponseDto update(@NonNull int id,@NonNull UserRequestDto dto) {
         UserEntity user=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
                 MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        user= this.dtoToEntiy(dto);
+       this.dtoToEntiy(dto,user);
         user = userRepository.save(user);
         return entityToDto(user);
     }
@@ -222,13 +256,10 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 
         return dto;
     }
-    public UserEntity dtoToEntiy(UserRequestDto dto) {
-        if (dto == null) {
-            return null;
-        }
+    public void dtoToEntiy(UserRequestDto dto, UserEntity entity) {
 
-        UserEntity entity = new UserEntity();
-        entity.setId(dto.getId());
+
+//          entity.setId(dto.getId());
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
         entity.setPassword(bCryptPasswordEncoder.encode(dto.getPassword())); // Để bỏ qua trường password
@@ -237,7 +268,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         entity.setActive(dto.isActive());
         entity.setForgotToken(dto.getForgotToken());
         entity.setForgotTokenExpire(dto.getForgotTokenExpire());
-        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setCreatedAt(new Date());
         entity.setUpdatedAt(dto.getUpdatedAt());
 
         // Mapping các bài viết (posts)
@@ -265,6 +296,6 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 //                    .collect(Collectors.toList()));
 //        }
 
-        return entity;
+
     }
 }

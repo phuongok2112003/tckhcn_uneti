@@ -32,4 +32,12 @@ public class EbsTokenUtils {
                 .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
                 .sign(algorithm);
     }
+    public static String createCode(String code,String email ) {
+        return JWT.create()
+                .withSubject(email)
+                .withClaim("code", code)
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_CODE))
+                .sign(algorithm);
+    }
 }

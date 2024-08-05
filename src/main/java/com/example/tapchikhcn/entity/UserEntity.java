@@ -42,9 +42,9 @@ public class UserEntity implements UserDetails {
     private String verifyToken;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = false;
+    private boolean isActive ;
 
-    @Column(name = "forgot_token", length = 191)
+    @Column(name = "forgot_token", length = 512)
     private String forgotToken;
 
     @Column(name = "forgot_token_expire")

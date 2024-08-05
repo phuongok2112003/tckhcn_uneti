@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.services;
 
+import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
 import com.example.tapchikhcn.dto.search.EntiySearch;
@@ -28,4 +29,5 @@ public interface UserService {
     Page<UserResponseDto> searchBy(EntiySearch search);
 
    String sendPasswordResetCode(String email);
+   void verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);
 }
