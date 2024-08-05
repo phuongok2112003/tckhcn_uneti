@@ -29,7 +29,10 @@ public class UploadFileController {
     private String IMAGE_UPLOAD_DIR;
 
     @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadImage(@RequestParam("files") MultipartFile[] files) {
+        for(MultipartFile file:files){
+
+
         if (file.isEmpty()) {
             return new ResponseEntity<>("No file uploaded", HttpStatus.BAD_REQUEST);
         }
@@ -49,38 +52,42 @@ public class UploadFileController {
             Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
             Files.write(path, file.getBytes());
 
-            return new ResponseEntity<>("Image uploaded successfully: " + path.toString(), HttpStatus.OK);
+
         } catch (IOException e) {
             return new ResponseEntity<>("Failed to upload image: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        }
+        return new ResponseEntity<>("Files uploaded successfully", HttpStatus.OK);
     }
 
     @PostMapping("/upload-pdf")
-    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return new ResponseEntity<>("No file uploaded", HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<String> uploadPdf(@RequestParam("files") MultipartFile[] files) {
 
-        if (!file.getContentType().equals("application/pdf")) {
-            return new ResponseEntity<>("File must be a PDF", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            File directory = new File(PDF_UPLOAD_DIR);
-            if (!directory.exists()) {
-                directory.mkdirs();
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                return new ResponseEntity<>("No file uploaded", HttpStatus.BAD_REQUEST);
             }
 
-            String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            Path path = Paths.get(PDF_UPLOAD_DIR + filename);
-            Files.write(path, file.getBytes());
+            if (!file.getContentType().equals("application/pdf")) {
+                return new ResponseEntity<>("File must be a PDF", HttpStatus.BAD_REQUEST);
+            }
 
-            return new ResponseEntity<>("PDF uploaded successfully: " + path.toString(), HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Failed to upload PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            try {
+                File directory = new File(PDF_UPLOAD_DIR);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                Path path = Paths.get(PDF_UPLOAD_DIR + filename);
+                Files.write(path, file.getBytes());
+
+            } catch (IOException e) {
+                return new ResponseEntity<>("Failed to upload PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+        return new ResponseEntity<>("Files uploaded successfully", HttpStatus.OK);
     }
-
     @GetMapping("/image/{filename}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
         try {

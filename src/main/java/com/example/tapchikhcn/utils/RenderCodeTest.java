@@ -1,4 +1,4 @@
-package com.example.onlineexam.utils;
+package com.example.tapchikhcn.utils;
 
 public class RenderCodeTest {
     public static String setValue(){

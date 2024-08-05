@@ -15,6 +15,7 @@ import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.UserService;
 import com.example.tapchikhcn.utils.EbsSecurityUtils;
 import com.example.tapchikhcn.utils.PageUtils;
+import com.example.tapchikhcn.utils.RenderCodeTest;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.function.EntityResponse;
@@ -49,6 +51,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtTokenBlacklist tokenBlacklist;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
     public UserResponseDto getUserDtoByUsername(String username) {
         UserEntity user = userRepository.findByUsername(EbsSecurityUtils.getUsername());
@@ -83,6 +86,13 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         Page<UserEntity> entityList=  userRepository.findAll(pageable);
         List<UserResponseDto> userResponseDtos=entityList.stream().map(this::entityToDto).collect(Collectors.toList());
         return new PageImpl<>(userResponseDtos,pageable,entityList.getTotalElements());
+    }
+
+    @Override
+    public String sendPasswordResetCode(String email) {
+        String code= RenderCodeTest.setValue();
+
+        return code;
     }
 
     @Override
@@ -222,7 +232,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         entity.setId(dto.getId());
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
-        entity.setPassword(null); // Để bỏ qua trường password
+        entity.setPassword(bCryptPasswordEncoder.encode(dto.getPassword())); // Để bỏ qua trường password
         entity.setPermission(dto.getPermission());
         entity.setVerifyToken(dto.getVerifyToken());
         entity.setActive(dto.isActive());

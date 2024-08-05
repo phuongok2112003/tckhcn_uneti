@@ -3,13 +3,17 @@ package com.example.tapchikhcn.controller;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
 import com.example.tapchikhcn.dto.search.EntiySearch;
+import com.example.tapchikhcn.entity.UserEntity;
+import com.example.tapchikhcn.services.EmailService;
 import com.example.tapchikhcn.services.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserController {
     private final UserService userService;
-
+    private final EmailService emailService;
   @PostAuthorize("returnObject.username == authentication.name or hasAuthority('admin')")
     @GetMapping("/{username}")
     public UserResponseDto getByUsername(@PathVariable("username") String username) {
@@ -58,6 +62,10 @@ public class UserController {
     public Page<UserResponseDto> searh(EntiySearch search) {
 
         return userService.searchBy(search);
+    }
+    @PostMapping("/forgot")
+    public String forgotPassword(@RequestParam String email) {
+        return userService.sendPasswordResetCode(email);
     }
 
 

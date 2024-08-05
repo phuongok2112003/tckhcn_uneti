@@ -27,5 +27,5 @@ public interface UserService {
     boolean permanentLock(String username);
     Page<UserResponseDto> searchBy(EntiySearch search);
 
-
+   String sendPasswordResetCode(String email);
 }
