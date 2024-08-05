@@ -1,6 +1,7 @@
 package com.example.tapchikhcn.dto.response;
 
 import com.example.tapchikhcn.entity.PostEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +15,11 @@ import java.util.Date;
 public class BannerResponseDto {
     private int id;
     private String image;
+    private String url;
     private int type;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
-    private PostResponseDto post;
+    private int post;
 }

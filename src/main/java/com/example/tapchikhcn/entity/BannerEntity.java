@@ -23,7 +23,7 @@ public class BannerEntity {
     @Column(name = "image", nullable = false, length = 191)
     private String image;
 
-    @Column(name = "url", nullable = false, length = 191)
+    @Column(name = "url", nullable = true, length = 191)
     private String url;
 
     @Column(name = "type", nullable = false)
