@@ -7,6 +7,8 @@ import com.example.tapchikhcn.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/banner")
@@ -26,6 +28,11 @@ public class BannerController {
     @PutMapping("/{id}")
     public EOResponse<BannerResponseDto> updateBy(@PathVariable(value = "id") int id, @RequestBody BannerRequestDto dto) {
         return EOResponse.build(bannerService.updateBy(id, dto));
+    }
+
+    @GetMapping("/by-post/{postId}")
+    public EOResponse<List<BannerResponseDto>> getByPostId(@PathVariable(value = "postId") int postId) {
+        return EOResponse.build(bannerService.getByPostId(postId));
     }
 
     @DeleteMapping("/{id}")

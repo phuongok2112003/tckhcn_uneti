@@ -33,7 +33,8 @@ public class FileEntity {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @Column(name = "cat_id")
-    private int catId;
+    @ManyToOne
+    @JoinColumn(name = "cat_id")
+    private CategoryEntity catId;
 
 }

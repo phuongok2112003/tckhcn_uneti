@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BannerRepository extends JpaRepository<BannerEntity, Integer> {
-    List<BannerEntity> findByPost(int post);
+    List<BannerEntity> findByPostId(int postId);
 }
