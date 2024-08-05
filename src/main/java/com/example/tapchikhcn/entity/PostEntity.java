@@ -82,7 +82,7 @@ public class PostEntity {
         return PostStatus.parseByCode(status);
     }
 
-    public void setStatus(PostStatus status) {
+    public void setStatus(String status) {
         this.status = status.toString();
     }
 }
