@@ -10,6 +10,6 @@ public interface BannerService {
     BannerResponseDto getById(int id);
     BannerResponseDto createBy(BannerRequestDto dto);
     BannerResponseDto updateBy(int id, BannerRequestDto dto);
-   // List<BannerResponseDto> getByPost(int id);
+    List<BannerResponseDto> getByPostId(int postId);
     void deleteBy(int id);
 }

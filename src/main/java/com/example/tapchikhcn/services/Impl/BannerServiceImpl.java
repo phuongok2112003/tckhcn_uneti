@@ -19,14 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class BannerServiceImpl implements BannerService {
     private final BannerRepository bannerRepository;
-    private final BannerMapper bannerMapper;
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
 
     @Override
     public BannerResponseDto getById(int id) {
@@ -41,7 +40,6 @@ public class BannerServiceImpl implements BannerService {
         BannerEntity bannerEntity = this.requestToEntityMapper(dto);
         bannerRepository.save(bannerEntity);
         return this.entityToResponseMapper(bannerEntity);
-        //return  this.entityToResponseMapper(bannerEntity);
     }
 
     @Override
@@ -54,7 +52,16 @@ public class BannerServiceImpl implements BannerService {
         return this.entityToResponseMapper(bannerEntity);
     }
 
+    @Override
+    public List<BannerResponseDto> getByPostId(int postId) {
+        PostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(postId)));
 
+        List<BannerEntity> bannerEntities = bannerRepository.findByPostId(postId);
+        return bannerEntities.stream()
+                .map(this::entityToResponseMapper)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void deleteBy(int id) {
