@@ -102,6 +102,10 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     public String sendPasswordResetCode(String email) {
         String code= RenderCodeTest.setValue();
         UserEntity user=userRepository.findByEmail(email);
+        if(user==null){
+            throw new EOException(ENTITY_NOT_FOUND,
+                    MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
+        }
         user.setForgotToken(EbsTokenUtils.createCode(code,email));
         userRepository.save(user);
         emailService.sendEmail(email,"Password Reset Request",code);
@@ -109,8 +113,12 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     }
 
     @Override
-    public void verifyPasswordResetCode(PasswordResetRequest passwordResetRequest) {
+    public Boolean verifyPasswordResetCode(PasswordResetRequest passwordResetRequest) {
         UserEntity user=userRepository.findByEmail(passwordResetRequest.getEmail());
+        if(user==null){
+            throw new EOException(ENTITY_NOT_FOUND,
+                    MessageCodes.EMAIL_NOT_FOUND, String.valueOf(passwordResetRequest.getEmail()));
+        }
         Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(user.getForgotToken());
@@ -122,9 +130,12 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         if(emailVerify.equals(passwordResetRequest.getEmail())&&codeVerify.equals(passwordResetRequest.getCode())&&pasword1.equals(pasword2)){
           user.setPassword(bCryptPasswordEncoder.encode(pasword1));
           userRepository.save(user);
+          return true;
         }
-        else throw new EOException(ERROR_CODE,
-                MessageCodes.USER_NOT_VERIFY,emailVerify);
+        else{
+            throw new EOException(ERROR_CODE,
+                    MessageCodes.USER_NOT_VERIFY,emailVerify);
+        }
 
     }
 
@@ -139,7 +150,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     }
 
     @Override
-    public void logout(HttpServletRequest request) {
+    public Boolean logout(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
             throw new EOException(UserStatus.IS_NOT_TOKEN);
@@ -151,6 +162,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         }
 
         tokenBlacklist.add(token);
+        return true;
     }
 
     @Override
@@ -167,11 +179,15 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 
     @Override
     public UserResponseDto update(@NonNull int id,@NonNull UserRequestDto dto) {
-        UserEntity user=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
+        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
                 MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-       this.dtoToEntiy(dto,user);
-        user = userRepository.save(user);
-        return entityToDto(user);
+        entity.setUsername(dto.getUsername());
+        entity.setEmail(dto.getEmail());
+        entity.setPermission(dto.getPermission());
+        entity.setActive(dto.isActive());
+        entity.setUpdatedAt(new Date());
+       userRepository.save(entity);
+        return entityToDto(entity);
     }
 
     @Override

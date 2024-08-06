@@ -11,6 +11,5 @@ public class PasswordResetRequest {
 
     private String password;
 
-
     private String password2;
 }

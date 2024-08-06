@@ -1,14 +1,12 @@
 package com.example.tapchikhcn.configuration;
 
-
-
 import com.example.tapchikhcn.constans.enums.Variables;
+import com.example.tapchikhcn.dto.request.LoginRequest;
 import com.example.tapchikhcn.entity.UserEntity;
 import com.example.tapchikhcn.error.CommonStatus;
 import com.example.tapchikhcn.error.DataError;
 import com.example.tapchikhcn.services.UserService;
 import com.example.tapchikhcn.utils.EbsConvertUtils;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.DisabledException;
@@ -31,24 +29,21 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        if (hasException(response, exception))
+        if (hasException(response, exception)) return;
+
+        LoginRequest loginRequest = CustomAuthenticationFilter.getLoginRequest(); // Retrieve loginRequest from thread-local variable
+        if (loginRequest == null) {
+            response.getWriter().write(ToStringBuilder.reflectionToString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
             return;
+        }
 
-        String username = request.getParameter("username");
+        String username = loginRequest.getUsername();
         UserEntity user = userService.getUserByUsername(username);
-        // user != null vì loadUserByUsername đã check, nếu null thì đã có trả ra UsernameNotFoundException
-
-//        byte newFailAttempts = (byte) (user.getFailedAttempt() + 1);
-//        userService.increaseFailedAttempts(username, newFailAttempts);
-//        if (newFailAttempts > Variables.MAX_FAILED_ATTEMPTS) {
-//            int coefficient = newFailAttempts - Variables.MAX_FAILED_ATTEMPTS;
-//            userService.temporaryLock(username, coefficient);
-//            String message = String.format(CommonStatus.TEMPORARY_LOCK.getMessage(), Variables.LOCK_TIME_DURATION * coefficient);
-//            response.getWriter().write(ToStringBuilder.reflectionToString(DataError.build(CommonStatus.TEMPORARY_LOCK.getCode(), message)));
-//            return;
-//        }
 
         response.getWriter().write(ToStringBuilder.reflectionToString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
+
+        // Clear the thread-local variable
+        CustomAuthenticationFilter.clearLoginRequest();
     }
 
     private boolean hasException(HttpServletResponse response, AuthenticationException exception) throws IOException {
