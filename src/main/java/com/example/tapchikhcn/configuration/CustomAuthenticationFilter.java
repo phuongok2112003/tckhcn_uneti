@@ -14,6 +14,7 @@ import java.io.IOException;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
+    private static final ThreadLocal<LoginRequest> loginRequestThreadLocal = new ThreadLocal<>();
 
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -21,13 +22,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-//        String username = request.getParameter("username");
-//        String password = request.getParameter("password");
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-//        return authenticationManager.authenticate(authenticationToken);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+            loginRequestThreadLocal.set(loginRequest); // Store loginRequest in thread-local variable
 
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
@@ -37,5 +35,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static LoginRequest getLoginRequest() {
+        return loginRequestThreadLocal.get();
+    }
+
+    public static void clearLoginRequest() {
+        loginRequestThreadLocal.remove();
     }
 }

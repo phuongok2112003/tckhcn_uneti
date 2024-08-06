@@ -21,7 +21,7 @@ public interface UserService {
     UserEntity getUserByUsername(String username);
 
     UserResponseDto getInfo();
-    void logout(HttpServletRequest request);
+    Boolean logout(HttpServletRequest request);
     UserResponseDto save(UserRequestDto dto);
     UserResponseDto update(@NonNull int id, @NonNull UserRequestDto dto);
     Boolean delete(int id);
@@ -29,5 +29,5 @@ public interface UserService {
     Page<UserResponseDto> searchBy(EntiySearch search);
 
    String sendPasswordResetCode(String email);
-   void verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);
+   Boolean verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);
 }

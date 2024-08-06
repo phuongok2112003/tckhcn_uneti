@@ -7,6 +7,7 @@ import com.example.tapchikhcn.dto.search.EntiySearch;
 import com.example.tapchikhcn.entity.UserEntity;
 import com.example.tapchikhcn.services.EmailService;
 import com.example.tapchikhcn.services.UserService;
+import com.example.tapchikhcn.utils.EOResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,49 +29,49 @@ public class UserController {
     private final EmailService emailService;
   @PostAuthorize("returnObject.username == authentication.name or hasAuthority('admin')")
     @GetMapping("/{username}")
-    public UserResponseDto getByUsername(@PathVariable("username") String username) {
-        return userService.getUserDtoByUsername(username);
+    public EOResponse<UserResponseDto> getByUsername(@PathVariable("username") String username) {
+        return EOResponse.build(userService.getUserDtoByUsername(username));
     }
 
     @GetMapping
-    public UserResponseDto getInfo() {
-        return userService.getInfo();
+    public  EOResponse<UserResponseDto>  getInfo() {
+        return  EOResponse.build(userService.getInfo());
     }
 
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping
-    public UserResponseDto save(@RequestBody UserRequestDto userDto) {
-        return userService.save(userDto);
+    public  EOResponse<UserResponseDto>  save(@RequestBody UserRequestDto userDto) {
+        return  EOResponse.build(userService.save(userDto));
     }
     @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable int id) {
-        return userService.delete(id);
+    public EOResponse<Boolean> delete(@PathVariable int id) {
+        return  EOResponse.build(userService.delete(id));
     }
     @PutMapping("/logout")
-    public boolean logout(HttpServletRequest request) {
-        userService.logout(request);
-        return true;
+    public EOResponse<Boolean> logout(HttpServletRequest request) {
+
+        return EOResponse.build(userService.logout(request));
     }
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
-    public UserResponseDto update(@PathVariable int id,@RequestBody @NonNull UserRequestDto userDto) {
+    public  EOResponse<UserResponseDto>  update(@PathVariable int id,@RequestBody @NonNull UserRequestDto userDto) {
 
-        return userService.update(id,userDto);
+        return  EOResponse.build(userService.update(id,userDto));
     }
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/search")
-    public Page<UserResponseDto> searh(EntiySearch search) {
+    public EOResponse<Page<UserResponseDto>> searh(EntiySearch search) {
 
-        return userService.searchBy(search);
+        return  EOResponse.build(userService.searchBy(search));
     }
     @PostMapping("/forgot")
-    public String forgotPassword(@RequestParam String email) {
-        return userService.sendPasswordResetCode(email);
+    public EOResponse<String> forgotPassword(@RequestParam String email) {
+        return EOResponse.build(userService.sendPasswordResetCode(email));
     }
     @PostMapping("/resetPasword")
-    public void forgotPassword(@RequestBody PasswordResetRequest request) {
-        userService.verifyPasswordResetCode(request);
+    public EOResponse<Boolean> forgotPassword(@RequestBody PasswordResetRequest request) {
+      return   EOResponse.build(userService.verifyPasswordResetCode(request));
     }
 
 
