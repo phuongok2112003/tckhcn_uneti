@@ -1,5 +1,9 @@
 package com.example.tapchikhcn.controller;
 
+import com.example.tapchikhcn.constans.MessageCodes;
+import com.example.tapchikhcn.dto.response.UploadFIleReponseDto;
+import com.example.tapchikhcn.exceptions.EOException;
+import com.example.tapchikhcn.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +19,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import static com.example.tapchikhcn.constans.ErrorCodes.ERROR_CODE;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,18 +37,22 @@ public class UploadFileController {
     private String IMAGE_UPLOAD_DIR;
 
     @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadImage(@RequestParam("files") MultipartFile[] files) {
+    public EOResponse<UploadFIleReponseDto> uploadImage(@RequestParam("files") MultipartFile[] files) {
+        UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
+        List<String> url=new ArrayList<>();
         for(MultipartFile file:files){
 
 
         if (file.isEmpty()) {
-            return new ResponseEntity<>("No file uploaded", HttpStatus.BAD_REQUEST);
+            throw new EOException(ERROR_CODE,
+                    MessageCodes.NOT_NULL,file.getName());
         }
         String contentType = file.getContentType();
         if (contentType == null || !(contentType.equals(MediaType.IMAGE_JPEG_VALUE) ||
                 contentType.equals(MediaType.IMAGE_PNG_VALUE) ||
                 contentType.equals(MediaType.IMAGE_GIF_VALUE))) {
-            return new ResponseEntity<>("Invalid file type. Only JPEG, PNG, and GIF are allowed.", HttpStatus.BAD_REQUEST);
+            throw new EOException(ERROR_CODE,
+                    MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getName());
         }
         try {
             File directory = new File(IMAGE_UPLOAD_DIR);
@@ -51,25 +63,30 @@ public class UploadFileController {
             String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
             Files.write(path, file.getBytes());
-
+            url.add("./public/post-image/"+filename);
 
         } catch (IOException e) {
-            return new ResponseEntity<>("Failed to upload image: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EOException(ERROR_CODE,
+                    e.getMessage(),file.getName());
         }
         }
-        return new ResponseEntity<>("Files uploaded successfully", HttpStatus.OK);
+        uploadFIleReponseDto.setUrls(url);
+        return EOResponse.build(uploadFIleReponseDto);
     }
 
     @PostMapping("/upload-pdf")
-    public ResponseEntity<String> uploadPdf(@RequestParam("files") MultipartFile[] files) {
-
+    public EOResponse<UploadFIleReponseDto> uploadPdf(@RequestParam("files") MultipartFile[] files) {
+        UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
+        List<String> url=new ArrayList<>();
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
-                return new ResponseEntity<>("No file uploaded", HttpStatus.BAD_REQUEST);
+                throw new EOException(ERROR_CODE,
+                        MessageCodes.NOT_NULL,file.getName());
             }
 
             if (!file.getContentType().equals("application/pdf")) {
-                return new ResponseEntity<>("File must be a PDF", HttpStatus.BAD_REQUEST);
+                throw new EOException(ERROR_CODE,
+                        MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getName());
             }
 
             try {
@@ -81,12 +98,14 @@ public class UploadFileController {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 Path path = Paths.get(PDF_UPLOAD_DIR + filename);
                 Files.write(path, file.getBytes());
-
+                url.add("./public/upload/"+filename);
             } catch (IOException e) {
-                return new ResponseEntity<>("Failed to upload PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new EOException(ERROR_CODE,
+                        e.getMessage(),file.getName());
             }
         }
-        return new ResponseEntity<>("Files uploaded successfully", HttpStatus.OK);
+        uploadFIleReponseDto.setUrls(url);
+        return EOResponse.build(uploadFIleReponseDto);
     }
     @GetMapping("/image/{filename}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
