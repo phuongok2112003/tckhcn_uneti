@@ -33,14 +33,14 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         LoginRequest loginRequest = CustomAuthenticationFilter.getLoginRequest(); // Retrieve loginRequest from thread-local variable
         if (loginRequest == null) {
-            response.getWriter().write(ToStringBuilder.reflectionToString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
+            response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
             return;
         }
 
         String username = loginRequest.getUsername();
         UserEntity user = userService.getUserByUsername(username);
 
-        response.getWriter().write(ToStringBuilder.reflectionToString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
+        response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
 
         // Clear the thread-local variable
         CustomAuthenticationFilter.clearLoginRequest();
