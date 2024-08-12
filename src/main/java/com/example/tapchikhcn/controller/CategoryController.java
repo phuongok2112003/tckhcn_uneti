@@ -8,6 +8,7 @@ import com.example.tapchikhcn.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,12 +24,12 @@ public class CategoryController {
     public EOResponse<CategoryResponseDto> getById(@PathVariable(value = "id") int id) {
         return EOResponse.build(categoryService.getById(id));
     }
-
-    @PostMapping
+    @PreAuthorize("hasAuthority('admin')")
+    @PostMapping()
     public EOResponse<CategoryResponseDto> createBy(@RequestBody CategoryRequestDto dto) {
         return EOResponse.build(categoryService.createBy(dto));
     }
-
+    @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
     public EOResponse<CategoryResponseDto> updateBy(@PathVariable(value = "id") int id, @RequestBody CategoryRequestDto dto) {
         return EOResponse.build(categoryService.updateBy(id, dto));
@@ -43,7 +44,7 @@ public class CategoryController {
     public EOResponse<List<CategoryResponseDto>> getPage() {
         return EOResponse.build(categoryService.getAllPosts());
     }
-
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{id}")
     public EOResponse<Boolean> deleteBy(@PathVariable(value = "id") int id) {
         categoryService.deleteBy(id);

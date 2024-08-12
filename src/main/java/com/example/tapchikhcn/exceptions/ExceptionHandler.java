@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.util.Objects;
@@ -38,5 +39,10 @@ public class ExceptionHandler {
                 new Object[]{ex.code, ex.getMessage(), subError.getClassName(), fieldValuesStr});
         return ResponseEntity.ok(EOResponse.buildMsg(ex.code, ex.message, ex.getApiSubErrors()));
     }
-
+    @org.springframework.web.bind.annotation.ExceptionHandler({AccessDeniedException.class})
+    protected ResponseEntity<Object> handleEntityNotFound(AccessDeniedException ex) {
+        log.error("Handle Exception: errorMessage = {}", ex.getMessage(), ex);
+        ApiMessageError error = new ApiMessageError(ex.getMessage(), null);
+        return ResponseEntity.ok(EOResponse.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "errors.access is denied", error, new Object[0]));
+    }
 }
