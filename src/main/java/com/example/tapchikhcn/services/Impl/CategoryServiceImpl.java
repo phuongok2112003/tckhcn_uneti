@@ -4,12 +4,20 @@ import com.example.tapchikhcn.constans.ErrorCodes;
 import com.example.tapchikhcn.constans.MessageCodes;
 import com.example.tapchikhcn.dto.request.CategoryRequestDto;
 import com.example.tapchikhcn.dto.response.CategoryResponseDto;
+import com.example.tapchikhcn.dto.response.PostResponseDto;
 import com.example.tapchikhcn.entity.CategoryEntity;
+import com.example.tapchikhcn.entity.PostEntity;
 import com.example.tapchikhcn.exceptions.EOException;
 import com.example.tapchikhcn.repository.CategoryRepository;
 import com.example.tapchikhcn.services.CategoryService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -37,6 +45,22 @@ public class CategoryServiceImpl implements CategoryService {
         entity.setId(id);
         categoryRepository.save(entity);
         return this.entityToResponseMapper(entity);
+    }
+
+    @Override
+    public Page<CategoryResponseDto> getPage(Pageable pageable) {
+        Page<CategoryEntity> categoryEntities = categoryRepository.findAll(pageable);
+        List<CategoryResponseDto> categoryResponseDtos = categoryEntities.stream()
+                .map(this::entityToResponseMapper)
+                .collect(Collectors.toList());
+        return new PageImpl<>(categoryResponseDtos, pageable, categoryEntities.getTotalElements());
+    }
+    @Override
+    public List<CategoryResponseDto> getAllPosts() {
+        List<CategoryEntity> postEntities = categoryRepository.findAll();
+        return postEntities.stream()
+                .map(this::entityToResponseMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
