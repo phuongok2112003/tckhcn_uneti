@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.controller;
 
+import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
@@ -73,6 +74,9 @@ public class UserController {
     public EOResponse<Boolean> forgotPassword(@RequestBody PasswordResetRequest request) {
       return   EOResponse.build(userService.verifyPasswordResetCode(request));
     }
-
+    @PutMapping("/refresh-token")
+    public TokenDto refreshToken(@RequestParam("token") String token) {
+        return userService.refreshToken(token);
+    }
 
 }

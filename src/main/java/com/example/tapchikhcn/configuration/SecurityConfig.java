@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/configuration/ui",
             "/swagger-resources/**",
             "/swagger-ui.html",
+            "/user/refresh-token",
             "/webjars/**"
     };
 
