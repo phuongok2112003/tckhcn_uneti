@@ -3,10 +3,17 @@ package com.example.tapchikhcn.configuration;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.tapchikhcn.constans.enums.Variables;
 import com.example.tapchikhcn.entity.UserEntity;
+import com.example.tapchikhcn.error.CommonStatus;
+import com.example.tapchikhcn.error.DataError;
+import com.example.tapchikhcn.utils.EbsConvertUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,8 +54,27 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        processJwtAuthentication(token);
-        filterChain.doFilter(request, response);
+        try {
+            processJwtAuthentication(token);
+            filterChain.doFilter(request, response);
+        } catch (TokenExpiredException ex) {
+
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.TokenExpired)));
+            response.getWriter().flush();
+        }catch (SignatureVerificationException ex){
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(ex.getMessage());
+            response.getWriter().flush();
+        }
+        catch (JWTVerificationException ex) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.TokenIsInvalid)));
+            response.getWriter().flush();
+        }
     }
 
     private void processJwtAuthentication(String token) {
