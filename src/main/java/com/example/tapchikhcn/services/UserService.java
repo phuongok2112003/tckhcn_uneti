@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.services;
 
+import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
@@ -30,4 +31,5 @@ public interface UserService {
 
    String sendPasswordResetCode(String email);
    Boolean verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);
+    TokenDto refreshToken(String refreshToken);
 }
