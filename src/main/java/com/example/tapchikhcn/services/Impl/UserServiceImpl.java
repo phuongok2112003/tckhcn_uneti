@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.tapchikhcn.configuration.JwtTokenBlacklist;
 import com.example.tapchikhcn.constans.MessageCodes;
 import com.example.tapchikhcn.constans.enums.Variables;
+import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
@@ -137,6 +138,22 @@ public class UserServiceImpl implements UserService , UserDetailsService {
                     MessageCodes.USER_NOT_VERIFY,emailVerify);
         }
 
+    }
+
+    @Override
+    public TokenDto refreshToken(String refreshToken) {
+        Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(refreshToken);
+        String username = decodedJWT.getSubject();
+        UserEntity user = userRepository.findByUsername(username);
+
+        if (null == user) {
+            throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
+        }
+
+        String accessToken = EbsTokenUtils.createAccessToken(user);
+        return new TokenDto(accessToken, refreshToken);
     }
 
     @Override
