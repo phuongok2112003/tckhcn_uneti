@@ -13,7 +13,13 @@ import com.example.tapchikhcn.repository.PostRepository;
 import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.PostService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -52,6 +58,16 @@ public class PostServiceImpl implements PostService {
         postRepository.findById(id)
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         postRepository.deleteById(id);
+    }
+
+
+    @Override
+    public Page<PostResponseDto> getPage(Pageable pageable) {
+        Page<PostEntity> postEntities = postRepository.findAll(pageable);
+        List<PostResponseDto> postResponseDtos = postEntities.stream()
+                .map(this::entityToResponseMapper)
+                .collect(Collectors.toList());
+        return new PageImpl<>(postResponseDtos, pageable, postEntities.getTotalElements());
     }
 
 
