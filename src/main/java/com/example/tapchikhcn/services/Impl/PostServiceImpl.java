@@ -90,15 +90,12 @@ public class PostServiceImpl implements PostService {
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setAuthorName(entity.getAuthorName());
         dto.setFile(entity.getFile());
-
         if (entity.getUser() != null) {
             dto.setUser(entity.getUser().getId());
         }
-
-        if (entity.getCategory() != null) {
-            dto.setCategory(categoryServiceImpl.entityToResponseMapper(entity.getCategory()));
+        if (entity.getUser() != null) {
+            dto.setCategory(entity.getCategory().getId());
         }
-
         return dto;
     }
 
@@ -125,9 +122,9 @@ public class PostServiceImpl implements PostService {
             entity.setUser(userEntity);
         }
 
-        if (dto.getCategory() != null) {
-            CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategory().getId())
-                    .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(dto.getCategory().getId())));
+        if (dto.getUser() != 0) {
+            CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategory())
+                    .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(dto.getCategory())));
             entity.setCategory(categoryEntity);
         }
 

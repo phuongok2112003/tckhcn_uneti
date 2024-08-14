@@ -21,7 +21,7 @@ public class PostRequestDto {
     private String body;
     private int view = 0;
     private int user;
-    private CategoryRequestDto category;
+    private int category;
     private String image;
     private String status = "disable";
     private boolean selected = true;
