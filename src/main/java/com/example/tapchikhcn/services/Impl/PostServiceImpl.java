@@ -13,6 +13,7 @@ import com.example.tapchikhcn.repository.PostRepository;
 import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.PostService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,14 +38,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponseDto createBy(PostRequestDto dto) {
+    public PostResponseDto createBy(@NonNull PostRequestDto dto) {
+        validatePostRequestDto(dto);
         PostEntity postEntity = this.requestToEntityMapper(dto);
         postRepository.save(postEntity);
         return this.entityToResponseMapper(postEntity);
     }
 
     @Override
-    public PostResponseDto updateBy(int id, PostRequestDto dto) {
+    public PostResponseDto updateBy(@NonNull int id,@NonNull PostRequestDto dto) {
+        validatePostRequestDto(dto);
         PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         postEntity = this.requestToEntityMapper(dto);
@@ -131,4 +134,18 @@ public class PostServiceImpl implements PostService {
         return entity;
     }
 
+    private void validatePostRequestDto(@NonNull PostRequestDto dto) {
+        if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, dto.getTitle());
+        }
+        if (dto.getSummary() == null || dto.getSummary().trim().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, dto.getSummary());
+        }
+        if (dto.getBody() == null || dto.getBody().trim().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, dto.getTitle());
+        }
+        if (dto.getAuthorName() == null || dto.getAuthorName().trim().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, dto.getAuthorName());
+        }
+    }
 }

@@ -35,12 +35,14 @@ public class FileServiceImpl implements FileService {
     }
     @Override
     public FileResponseDto createBy(FileRequestDto dto) {
+        validateFileRequestDto(dto);
         FileEntity fileEntity = this.requestToEntityMapper(dto);
         fileRepository.save(fileEntity);
         return this.entityToResponseMapper(fileEntity);
     }
     @Override
     public FileResponseDto updateBy(int id, FileRequestDto dto) {
+        validateFileRequestDto(dto);
         FileEntity fileEntity = fileRepository.findById(id)
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         fileEntity = this.requestToEntityMapper(dto);
@@ -97,5 +99,14 @@ public class FileServiceImpl implements FileService {
         }
 
         return entity;
+    }
+
+    private void validateFileRequestDto(FileRequestDto dto) {
+        if (dto.getName() == null || dto.getName().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, "File name cannot be null or empty.");
+        }
+        if (dto.getCreatedAt() == null) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, "CreatedAt cannot be null.");
+        }
     }
 }

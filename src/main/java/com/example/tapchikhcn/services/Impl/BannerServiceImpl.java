@@ -37,6 +37,7 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public BannerResponseDto createBy(BannerRequestDto dto) {
+        validateBannerRequestDto(dto);
         BannerEntity bannerEntity = this.requestToEntityMapper(dto);
         bannerRepository.save(bannerEntity);
         return this.entityToResponseMapper(bannerEntity);
@@ -44,6 +45,7 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public BannerResponseDto updateBy(int id, BannerRequestDto dto) {
+        validateBannerRequestDto(dto);
         BannerEntity bannerEntity = bannerRepository.findById(id)
             .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         bannerEntity = this.requestToEntityMapper(dto);
@@ -95,6 +97,12 @@ public class BannerServiceImpl implements BannerService {
             entity.setPost(postEntity);
         }
         return entity;
+    }
+
+    private void validateBannerRequestDto(BannerRequestDto dto) {
+        if (dto.getImage() == null || dto.getImage().trim().isEmpty()) {
+            throw new EOException(ErrorCodes.NOT_EMPTY, MessageCodes.NOT_NULL, "Image cannot be null or empty");
+        }
     }
 
 //    private BannerResponseDto entityToResponseMapper(BannerEntity entity) {
