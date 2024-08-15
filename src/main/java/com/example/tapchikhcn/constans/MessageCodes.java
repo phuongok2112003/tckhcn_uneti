@@ -8,5 +8,6 @@ public class MessageCodes {
     public static final String USER_NOT_VERIFY = "error.entity.user not verify";
     public static final String PROCESSED_SUCCESSFULLY ="Successfully";
     public static final String FILE_UPLOAD_NOT_FORMAT="error.file.file not format";
+
 }
 
