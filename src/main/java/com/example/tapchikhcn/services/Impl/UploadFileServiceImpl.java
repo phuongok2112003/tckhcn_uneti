@@ -25,10 +25,10 @@ import static com.example.tapchikhcn.constans.ErrorCodes.ERROR_CODE;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class UploadFileServiceImpl implements UploadfileService {
-    @Value("${file.upload-pdf-dir:uploads/pdfs/}")
+    @Value("${file.upload-pdf-dir}")
     private String PDF_UPLOAD_DIR;
 
-    @Value("${file.upload-image-dir:uploads/images/}")
+    @Value("${file.upload-image-dir}")
     private String IMAGE_UPLOAD_DIR;
 
     @Override
@@ -58,7 +58,7 @@ public class UploadFileServiceImpl implements UploadfileService {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
                 Files.write(path, file.getBytes());
-                url.add("./uploads/images/"+filename);
+                url.add("./public/post-image/"+filename);
 
             } catch (IOException e) {
                 throw new EOException(ERROR_CODE,
@@ -93,7 +93,7 @@ public class UploadFileServiceImpl implements UploadfileService {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 Path path = Paths.get(PDF_UPLOAD_DIR + filename);
                 Files.write(path, file.getBytes());
-                url.add("./uploads/pdfs/"+filename);
+                url.add("./public/upload/"+filename);
             } catch (IOException e) {
                 throw new EOException(ERROR_CODE,
                         e.getMessage(),file.getName());
