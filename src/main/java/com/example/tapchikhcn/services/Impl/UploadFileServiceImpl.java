@@ -40,14 +40,14 @@ public class UploadFileServiceImpl implements UploadfileService {
 
             if (file.isEmpty()) {
                 throw new EOException(ERROR_CODE,
-                        MessageCodes.NOT_NULL,file.getName());
+                        MessageCodes.NOT_NULL,file.getOriginalFilename());
             }
             String contentType = file.getContentType();
             if (contentType == null || !(contentType.equals(MediaType.IMAGE_JPEG_VALUE) ||
                     contentType.equals(MediaType.IMAGE_PNG_VALUE) ||
                     contentType.equals(MediaType.IMAGE_GIF_VALUE))) {
                 throw new EOException(ERROR_CODE,
-                        MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getName());
+                        MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getOriginalFilename());
             }
             try {
                 File directory = new File(IMAGE_UPLOAD_DIR);
@@ -76,12 +76,12 @@ public class UploadFileServiceImpl implements UploadfileService {
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
                 throw new EOException(ERROR_CODE,
-                        MessageCodes.NOT_NULL,file.getName());
+                        MessageCodes.NOT_NULL,file.getOriginalFilename());
             }
 
             if (!file.getContentType().equals("application/pdf")) {
                 throw new EOException(ERROR_CODE,
-                        MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getName());
+                        MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getOriginalFilename());
             }
 
             try {
@@ -96,7 +96,7 @@ public class UploadFileServiceImpl implements UploadfileService {
                 url.add("./public/upload/"+filename);
             } catch (IOException e) {
                 throw new EOException(ERROR_CODE,
-                        e.getMessage(),file.getName());
+                        e.getMessage(),file.getOriginalFilename());
             }
         }
         uploadFIleReponseDto.setUrls(url);

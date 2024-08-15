@@ -202,6 +202,9 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     public UserResponseDto update(@NonNull int id,@NonNull UserRequestDto dto) {
         UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
                 MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        if(!entity.getUsername().equals(dto.getUsername())){
+            this.validateDto(dto);
+        }
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
         entity.setPermission(dto.getPermission());
