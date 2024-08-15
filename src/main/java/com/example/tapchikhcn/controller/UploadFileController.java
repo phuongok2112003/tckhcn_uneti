@@ -1,8 +1,11 @@
 package com.example.tapchikhcn.controller;
+import com.example.tapchikhcn.dto.request.LoginRequest;
 import com.example.tapchikhcn.dto.request.UploadFileRequestDto;
 import com.example.tapchikhcn.dto.response.UploadFIleReponseDto;
 import com.example.tapchikhcn.services.UploadfileService;
 import com.example.tapchikhcn.utils.EOResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -68,13 +71,17 @@ public class UploadFileController {
         return new ResponseEntity<>(result,result.equals("Thành công")?HttpStatus.OK:HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @PutMapping("/image")
-    public ResponseEntity<String> putImage(@RequestBody UploadFileRequestDto filename, @RequestParam("files") MultipartFile[] files){
-        String result=uploadfileService.updateImage(filename,files);
-        return new ResponseEntity<>(result,result.equals("Thành công")?HttpStatus.OK:HttpStatus.INTERNAL_SERVER_ERROR);
+    public EOResponse<UploadFIleReponseDto> putImage(@RequestParam("filename") String filename, @RequestParam("files") MultipartFile[] files) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        UploadFileRequestDto request = objectMapper.readValue(filename, UploadFileRequestDto.class);
+        UploadFIleReponseDto result=uploadfileService.updateImage(request,files);
+        return EOResponse.build(result);
     }
     @PutMapping("/pdf")
-    public ResponseEntity<String> putpdf(@RequestBody UploadFileRequestDto filename, @RequestParam("files") MultipartFile[] files){
-        String result=uploadfileService.updatepdf(filename,files);
-        return new ResponseEntity<>(result,result.equals("Thành công")?HttpStatus.OK:HttpStatus.INTERNAL_SERVER_ERROR);
+    public EOResponse<UploadFIleReponseDto> putpdf(@RequestParam("filename") String filename, @RequestParam("files") MultipartFile[] files) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        UploadFileRequestDto request = objectMapper.readValue(filename, UploadFileRequestDto.class);
+        UploadFIleReponseDto result=uploadfileService.updatepdf(request,files);
+        return  EOResponse.build(result);
     }
 }

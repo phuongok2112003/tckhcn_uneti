@@ -148,21 +148,21 @@ public class UploadFileServiceImpl implements UploadfileService {
     }
 
     @Override
-    public String updateImage(UploadFileRequestDto imageCurr, MultipartFile[] image) {
+    public UploadFIleReponseDto updateImage(UploadFileRequestDto imageCurr, MultipartFile[] image) {
 
         for(String img:imageCurr.getFilename()){
             deleteImage(img);
         }
-            uploadImage(image);
-            return "Thành công";
+           return uploadImage(image);
+
     }
 
     @Override
-    public String updatepdf(UploadFileRequestDto pdfCurr,  MultipartFile[]  pdf) {
+    public UploadFIleReponseDto updatepdf(UploadFileRequestDto pdfCurr,  MultipartFile[]  pdf) {
         for(String p:pdfCurr.getFilename()) {
             deletePdf(p);
         }
-        uploadPdf(pdf);
-        return "Thành công";
+        return uploadPdf(pdf);
+
     }
 }

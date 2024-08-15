@@ -14,7 +14,7 @@ public interface UploadfileService {
     String deleteImage(String filename);
     String deletePdf( String filename);
 
-    String updateImage(UploadFileRequestDto imageCurr, MultipartFile[]  image);
-    String updatepdf(UploadFileRequestDto pdfCurr, MultipartFile[]  pdf);
+    UploadFIleReponseDto updateImage(UploadFileRequestDto imageCurr, MultipartFile[]  image);
+    UploadFIleReponseDto updatepdf(UploadFileRequestDto pdfCurr, MultipartFile[]  pdf);
 
 }
