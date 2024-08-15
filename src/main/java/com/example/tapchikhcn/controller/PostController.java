@@ -2,6 +2,7 @@ package com.example.tapchikhcn.controller;
 
 import com.example.tapchikhcn.dto.request.PostRequestDto;
 import com.example.tapchikhcn.dto.response.PostResponseDto;
+import com.example.tapchikhcn.dto.search.PostSearch;
 import com.example.tapchikhcn.services.PostService;
 import com.example.tapchikhcn.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ public class PostController {
     }
 
     @GetMapping("/page")
-    public EOResponse<Page<PostResponseDto>> getPage(Pageable pageable) {
-        return EOResponse.build(postService.getPage(pageable));
+    public EOResponse<Page<PostResponseDto>> getPage(PostSearch search) {
+        return EOResponse.build(postService.searchBy(search));
     }
 
     @DeleteMapping("/{id}")
