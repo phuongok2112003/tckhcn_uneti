@@ -11,7 +11,8 @@ import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
-import com.example.tapchikhcn.dto.search.EntiySearch;
+import com.example.tapchikhcn.dto.search.UserSearch;
+import com.example.tapchikhcn.entity.PostEntity;
 import com.example.tapchikhcn.entity.UserEntity;
 import com.example.tapchikhcn.error.CommonStatus;
 import com.example.tapchikhcn.error.UserStatus;
@@ -20,32 +21,28 @@ import com.example.tapchikhcn.services.EmailService;
 import com.example.tapchikhcn.services.mapper.UserMapper;
 import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.UserService;
+import com.example.tapchikhcn.specification.PostSpecification;
+import com.example.tapchikhcn.specification.UserSpecification;
 import com.example.tapchikhcn.utils.EbsSecurityUtils;
 import com.example.tapchikhcn.utils.EbsTokenUtils;
 import com.example.tapchikhcn.utils.PageUtils;
 import com.example.tapchikhcn.utils.RenderCodeTest;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.LockedException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.ProviderNotFoundException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.function.EntityResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.parser.Entity;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,10 +88,17 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     }
 
     @Override
-    public Page<UserResponseDto> searchBy(EntiySearch search) {
+    public Page<UserResponseDto> searchBy(UserSearch search) {
 
         Pageable pageable = PageUtils.getPageable(search.getPageIndex(), search.getPageSize());
-        Page<UserEntity> entityList=  userRepository.findAll(pageable);
+
+        Specification<UserEntity> spec = Specification.where(null);
+        if (search.getUsername() != null && !search.getUsername().isEmpty()) {
+            spec = spec.and(UserSpecification.searchUsername(search.getUsername()));
+        }
+
+        Page<UserEntity> entityList=  userRepository.findAll(spec, pageable);
+
         List<UserResponseDto> userResponseDtos=entityList.stream().map(this::entityToDto).collect(Collectors.toList());
         return new PageImpl<>(userResponseDtos,pageable,entityList.getTotalElements());
     }

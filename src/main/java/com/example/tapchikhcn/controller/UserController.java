@@ -4,8 +4,7 @@ import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
-import com.example.tapchikhcn.dto.search.EntiySearch;
-import com.example.tapchikhcn.entity.UserEntity;
+import com.example.tapchikhcn.dto.search.UserSearch;
 import com.example.tapchikhcn.services.EmailService;
 import com.example.tapchikhcn.services.UserService;
 import com.example.tapchikhcn.utils.EOResponse;
@@ -13,10 +12,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +59,7 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/search")
-    public EOResponse<Page<UserResponseDto>> searh(EntiySearch search) {
+    public EOResponse<Page<UserResponseDto>> searh(UserSearch search) {
 
         return  EOResponse.build(userService.searchBy(search));
     }

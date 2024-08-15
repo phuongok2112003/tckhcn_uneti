@@ -4,15 +4,12 @@ import com.example.tapchikhcn.dto.TokenDto;
 import com.example.tapchikhcn.dto.request.PasswordResetRequest;
 import com.example.tapchikhcn.dto.request.UserRequestDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
-import com.example.tapchikhcn.dto.search.EntiySearch;
+import com.example.tapchikhcn.dto.search.UserSearch;
 import com.example.tapchikhcn.entity.UserEntity;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.function.EntityResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.parser.Entity;
 
 
 public interface UserService {
@@ -27,7 +24,7 @@ public interface UserService {
     UserResponseDto update(@NonNull int id, @NonNull UserRequestDto dto);
     Boolean delete(int id);
     boolean permanentLock(String username);
-    Page<UserResponseDto> searchBy(EntiySearch search);
+    Page<UserResponseDto> searchBy(UserSearch search);
 
    String sendPasswordResetCode(String email);
    Boolean verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);

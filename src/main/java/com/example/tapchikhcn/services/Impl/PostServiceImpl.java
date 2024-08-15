@@ -5,7 +5,7 @@ import com.example.tapchikhcn.constans.MessageCodes;
 import com.example.tapchikhcn.dto.request.PostRequestDto;
 import com.example.tapchikhcn.dto.response.PostResponseDto;
 import com.example.tapchikhcn.dto.response.UserResponseDto;
-import com.example.tapchikhcn.dto.search.EntiySearch;
+import com.example.tapchikhcn.dto.search.UserSearch;
 import com.example.tapchikhcn.dto.search.PostSearch;
 import com.example.tapchikhcn.entity.CategoryEntity;
 import com.example.tapchikhcn.entity.PostEntity;
