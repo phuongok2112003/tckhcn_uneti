@@ -4,6 +4,9 @@ import com.example.tapchikhcn.constans.ErrorCodes;
 import com.example.tapchikhcn.constans.MessageCodes;
 import com.example.tapchikhcn.dto.request.PostRequestDto;
 import com.example.tapchikhcn.dto.response.PostResponseDto;
+import com.example.tapchikhcn.dto.response.UserResponseDto;
+import com.example.tapchikhcn.dto.search.EntiySearch;
+import com.example.tapchikhcn.dto.search.PostSearch;
 import com.example.tapchikhcn.entity.CategoryEntity;
 import com.example.tapchikhcn.entity.PostEntity;
 import com.example.tapchikhcn.entity.UserEntity;
@@ -12,11 +15,14 @@ import com.example.tapchikhcn.repository.CategoryRepository;
 import com.example.tapchikhcn.repository.PostRepository;
 import com.example.tapchikhcn.repository.UserRepository;
 import com.example.tapchikhcn.services.PostService;
+import com.example.tapchikhcn.specification.PostSpecification;
+import com.example.tapchikhcn.utils.PageUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,12 +71,21 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public Page<PostResponseDto> getPage(Pageable pageable) {
-        Page<PostEntity> postEntities = postRepository.findAll(pageable);
-        List<PostResponseDto> postResponseDtos = postEntities.stream()
+    public Page<PostResponseDto> searchBy(PostSearch search) {
+
+        Pageable pageable = PageUtils.getPageable(search.getPageIndex(), search.getPageSize());
+        Specification<PostEntity> spec = Specification.where(null);
+
+        if (search.getTitle() != null && !search.getTitle().isEmpty()) {
+            spec = spec.and(PostSpecification.searchTitle(search.getTitle()));
+        }
+
+        Page<PostEntity> entityList =  postRepository.findAll(spec, pageable);
+        List<PostResponseDto> postResponseDtos = entityList.stream()
                 .map(this::entityToResponseMapper)
                 .collect(Collectors.toList());
-        return new PageImpl<>(postResponseDtos, pageable, postEntities.getTotalElements());
+
+        return new PageImpl<>(postResponseDtos,pageable,entityList.getTotalElements());
     }
 
 
