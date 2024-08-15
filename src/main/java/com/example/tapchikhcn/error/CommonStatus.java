@@ -8,6 +8,7 @@ public enum CommonStatus implements ErrorStatus {
     FORBIDDEN(403, "errors.access_denied"),
     TokenIsInvalid(401,"Invalid token"),
     TokenExpired(401,"errors.The Token has expired"),
+    NameExit(500,"Name bị trùng"),
     OBJECT_IS_A_FOREIGN_KEY(403, "errors.object_is_a_foreign_key"),
 
     INTERNAL_SERVER_ERROR(500, "errors.internal_server_error"),

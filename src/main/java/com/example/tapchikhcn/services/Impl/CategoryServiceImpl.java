@@ -7,6 +7,7 @@ import com.example.tapchikhcn.dto.response.CategoryResponseDto;
 import com.example.tapchikhcn.dto.response.PostResponseDto;
 import com.example.tapchikhcn.entity.CategoryEntity;
 import com.example.tapchikhcn.entity.PostEntity;
+import com.example.tapchikhcn.error.CommonStatus;
 import com.example.tapchikhcn.exceptions.EOException;
 import com.example.tapchikhcn.repository.CategoryRepository;
 import com.example.tapchikhcn.services.CategoryService;
@@ -29,9 +30,14 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         return this.entityToResponseMapper(entity);
     }
-
+    void validateDto(CategoryRequestDto dto){
+        if(categoryRepository.findByName(dto.getName())!=null){
+            throw new EOException(CommonStatus.NameExit);
+        }
+    }
     @Override
     public CategoryResponseDto createBy(CategoryRequestDto dto) {
+        this.validateDto(dto);
         CategoryEntity entity = requestDtoToEntity(dto);
         categoryRepository.save(entity);
         return this.entityToResponseMapper(entity);
@@ -41,6 +47,9 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto updateBy(int id, CategoryRequestDto dto) {
         CategoryEntity entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        if(!entity.getName().equals(dto.getName())){
+            this.validateDto(dto);
+        }
         entity = this.requestDtoToEntity(dto);
         entity.setId(id);
         categoryRepository.save(entity);
