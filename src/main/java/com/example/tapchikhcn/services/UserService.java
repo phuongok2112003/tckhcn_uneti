@@ -21,7 +21,7 @@ public interface UserService {
     UserResponseDto getInfo();
     Boolean logout(HttpServletRequest request);
     UserResponseDto save(UserRequestDto dto);
-    UserResponseDto update(@NonNull int id, @NonNull UserRequestDto dto);
+    UserResponseDto update(@NonNull int id, UserRequestDto dto);
     Boolean delete(int id);
     boolean permanentLock(String username);
     Page<UserResponseDto> searchBy(UserSearch search);
