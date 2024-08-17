@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     @Override
     public UserEntity getUserByUsername(String username) {
         if (!StringUtils.hasText(username))
-            throw new EOException(UserStatus.USERNAME_IS_EXIST);
+            throw new EOException(UserStatus.EMAIL_IS_EXIST);
 
         UserEntity user = userRepository.findByEmail(username);
         if (null == user) {
@@ -190,7 +190,9 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     public UserResponseDto save(UserRequestDto dto) {
         dto.setUsername(dto.getUsername());
         this.validateDto(dto);
-
+        if (!StringUtils.hasText(dto.getPassword())) {
+            throw new EOException(UserStatus.PASSWORD_IS_EMPTY);
+        }
         UserEntity user = new UserEntity();
      this.dtoToEntiy(dto,user);
         user = userRepository.save(user);
@@ -199,7 +201,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     }
 
     @Override
-    public UserResponseDto update(@NonNull int id,@NonNull UserRequestDto dto) {
+    public UserResponseDto update(@NonNull int id, UserRequestDto dto) {
         UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
                 MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
         if(!entity.getUsername().equals(dto.getUsername())){
@@ -233,13 +235,11 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         }
 
         if (userRepository.findByEmail(dto.getUsername())!=null) {
-            throw new EOException(UserStatus.USERNAME_IS_EXIST);
+            throw new EOException(UserStatus.EMAIL_IS_EXIST);
         }
 
 
-        if (!StringUtils.hasText(dto.getPassword())) {
-            throw new EOException(UserStatus.PASSWORD_IS_EMPTY);
-        }
+
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
