@@ -18,7 +18,7 @@ public class EbsTokenUtils {
 
     public static String createAccessToken(UserEntity user) {
         return JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(user.getEmail())
                 .withClaim("id", user.getId())
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))

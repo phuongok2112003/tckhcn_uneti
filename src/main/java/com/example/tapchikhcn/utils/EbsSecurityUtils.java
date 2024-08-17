@@ -26,10 +26,10 @@ public class EbsSecurityUtils {
         return null;
     }
 
-    public static String getUsername() {
+    public static String getEmail() {
         if (isAuthenticated()) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            return ((UserEntity) authentication.getPrincipal()).getUsername();
+            return ((UserEntity) authentication.getPrincipal()).getEmail();
         }
 
         throw new EOException(CommonStatus.FORBIDDEN);

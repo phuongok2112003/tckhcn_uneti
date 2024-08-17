@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     private final EmailService emailService;
     @Override
     public UserResponseDto getUserDtoByUsername(String username) {
-        UserEntity user = userRepository.findByUsername(EbsSecurityUtils.getUsername());
+        UserEntity user = userRepository.findByEmail(EbsSecurityUtils.getEmail());
         if (null == user) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         if (!StringUtils.hasText(username))
             throw new EOException(UserStatus.USERNAME_IS_EXIST);
 
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByEmail(username);
         if (null == user) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
         String username = decodedJWT.getSubject();
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByEmail(username);
 
         if (null == user) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 
     @Override
     public UserResponseDto getInfo() {
-        UserEntity user = userRepository.findByUsername(EbsSecurityUtils.getUsername());
+        UserEntity user = userRepository.findByEmail(EbsSecurityUtils.getEmail());
         if (null == user) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
@@ -225,7 +225,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
             throw new EOException(UserStatus.USERNAME_IS_EMPTY);
         }
 
-        if (userRepository.findByUsername(dto.getUsername())!=null) {
+        if (userRepository.findByEmail(dto.getUsername())!=null) {
             throw new EOException(UserStatus.USERNAME_IS_EXIST);
         }
 
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByEmail(username);
         if (user == null) {
             throw new ProviderNotFoundException(CommonStatus.ACCOUNT_NOT_FOUND.getMessage());
         }
