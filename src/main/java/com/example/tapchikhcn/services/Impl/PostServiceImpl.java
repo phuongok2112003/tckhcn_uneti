@@ -19,12 +19,12 @@ import com.example.tapchikhcn.specification.PostSpecification;
 import com.example.tapchikhcn.utils.PageUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +73,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponseDto> searchBy(PostSearch search) {
 
-        Pageable pageable = PageUtils.getPageable(search.getPageIndex(), search.getPageSize());
+        Pageable pageable = PageUtils.getPageableWithSort(search.getPageIndex(), search.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
         Specification<PostEntity> spec = Specification.where(null);
 
         if (search.getTitle() != null && !search.getTitle().isEmpty()) {
