@@ -6,5 +6,6 @@ import java.util.List;
 
 @Data
 public class UploadFIleReponseDto {
-    List<String> urls;
+    String urls;
+    String fileName;
 }

@@ -32,12 +32,11 @@ public class UploadFileServiceImpl implements UploadfileService {
     private String IMAGE_UPLOAD_DIR;
 
     @Override
-    public UploadFIleReponseDto uploadImage(MultipartFile[] files) {
-        UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
-        List<String> url=new ArrayList<>();
+    public List<UploadFIleReponseDto> uploadImage(MultipartFile[] files) {
+        List<UploadFIleReponseDto> list=new ArrayList<>();
         for(MultipartFile file:files){
 
-
+            UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
             if (file.isEmpty()) {
                 throw new EOException(ERROR_CODE,
                         MessageCodes.NOT_NULL,file.getOriginalFilename());
@@ -58,28 +57,30 @@ public class UploadFileServiceImpl implements UploadfileService {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
                 Files.write(path, file.getBytes());
-                url.add("./public/post-image/"+filename);
-
+                uploadFIleReponseDto.setUrls("./public/post-image/"+filename);
+                uploadFIleReponseDto.setFileName(getFileName(filename));
+                list.add(uploadFIleReponseDto);
             } catch (IOException e) {
                 throw new EOException(ERROR_CODE,
                         e.getMessage(),file.getName());
             }
         }
-        uploadFIleReponseDto.setUrls(url);
-        return uploadFIleReponseDto;
+
+        return list;
     }
 
     @Override
-    public UploadFIleReponseDto uploadPdf(MultipartFile[] files) {
-        UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
-        List<String> url=new ArrayList<>();
-        for (MultipartFile file : files) {
+    public List<UploadFIleReponseDto> uploadPdf(MultipartFile[] files) {
+        List<UploadFIleReponseDto> list=new ArrayList<>();
+        for(MultipartFile file:files){
+
+            UploadFIleReponseDto uploadFIleReponseDto=new UploadFIleReponseDto();
             if (file.isEmpty()) {
                 throw new EOException(ERROR_CODE,
                         MessageCodes.NOT_NULL,file.getOriginalFilename());
             }
 
-            if (!file.getContentType().equals("application/pdf")) {
+            if (!Objects.equals(file.getContentType(), "application/pdf")) {
                 throw new EOException(ERROR_CODE,
                         MessageCodes.FILE_UPLOAD_NOT_FORMAT,file.getOriginalFilename());
             }
@@ -93,14 +94,17 @@ public class UploadFileServiceImpl implements UploadfileService {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 Path path = Paths.get(PDF_UPLOAD_DIR + filename);
                 Files.write(path, file.getBytes());
-                url.add("./public/upload/"+filename);
+
+                uploadFIleReponseDto.setUrls("./public/upload/"+filename);
+                uploadFIleReponseDto.setFileName(getFileName(filename));
+                list.add(uploadFIleReponseDto);
             } catch (IOException e) {
                 throw new EOException(ERROR_CODE,
                         e.getMessage(),file.getOriginalFilename());
             }
         }
-        uploadFIleReponseDto.setUrls(url);
-        return uploadFIleReponseDto;
+
+        return list;
     }
 
     @Override
@@ -146,9 +150,13 @@ public class UploadFileServiceImpl implements UploadfileService {
             return e.getMessage();
         }
     }
+    String getFileName(String s){
 
+       return s.substring(0, s.lastIndexOf("."));
+
+    }
     @Override
-    public UploadFIleReponseDto updateImage(UploadFileRequestDto imageCurr, MultipartFile[] image) {
+    public List<UploadFIleReponseDto> updateImage(UploadFileRequestDto imageCurr, MultipartFile[] image) {
 
         for(String img:imageCurr.getFilename()){
             deleteImage(img);
@@ -158,7 +166,7 @@ public class UploadFileServiceImpl implements UploadfileService {
     }
 
     @Override
-    public UploadFIleReponseDto updatepdf(UploadFileRequestDto pdfCurr,  MultipartFile[]  pdf) {
+    public List<UploadFIleReponseDto> updatepdf(UploadFileRequestDto pdfCurr,  MultipartFile[]  pdf) {
         for(String p:pdfCurr.getFilename()) {
             deletePdf(p);
         }
