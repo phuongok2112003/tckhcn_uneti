@@ -26,14 +26,13 @@ public class LogEntity {
     @Column(name = "author", nullable = false, columnDefinition = "TEXT")
     private String author;
 
-    @Column(name = "email", nullable = false, length = 255)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "sent_date", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     private Date sentDate;
 
-    @Column(name = "log_status", nullable = false, length = 255)
+    @Column(name = "log_status", nullable = false)
     private String logStatus;
 
     @Column(name = "category", nullable = false, columnDefinition = "TEXT")
