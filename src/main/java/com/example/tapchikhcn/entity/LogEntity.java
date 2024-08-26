@@ -46,6 +46,6 @@ public class LogEntity {
     }
 
     public void setStatus(String logStatus) {
-        this.logStatus = logStatus.toString();
+        this.logStatus = logStatus;
     }
 }

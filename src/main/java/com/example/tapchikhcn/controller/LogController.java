@@ -1,5 +1,6 @@
 package com.example.tapchikhcn.controller;
 
+import com.example.tapchikhcn.constans.enums.LogStatus;
 import com.example.tapchikhcn.dto.request.LogRequestDto;
 import com.example.tapchikhcn.dto.request.PostRequestDto;
 import com.example.tapchikhcn.dto.response.LogResponseDto;
@@ -19,7 +20,7 @@ public class LogController {
     private final LogService logService;
 
     @PutMapping("/{id}")
-    public EOResponse<LogResponseDto> updateBy(@PathVariable(value = "id") int id, String status) {
+    public EOResponse<LogResponseDto> updateBy(@PathVariable(value = "id") int id, LogStatus status) {
         return EOResponse.build(logService.updateStatus(id, status));
     }
     @GetMapping("/page")

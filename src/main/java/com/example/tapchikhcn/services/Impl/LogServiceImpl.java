@@ -2,6 +2,7 @@ package com.example.tapchikhcn.services.Impl;
 
 import com.example.tapchikhcn.constans.ErrorCodes;
 import com.example.tapchikhcn.constans.MessageCodes;
+import com.example.tapchikhcn.constans.enums.LogStatus;
 import com.example.tapchikhcn.dto.request.LogRequestDto;
 import com.example.tapchikhcn.dto.response.LogResponseDto;
 import com.example.tapchikhcn.dto.search.LogSearch;
@@ -27,10 +28,10 @@ import java.util.stream.Collectors;
 public class LogServiceImpl implements LogService {
     private final LogRepository logRepository;
 
-    public LogResponseDto updateStatus(int id, String status) {
+    public LogResponseDto updateStatus(int id, LogStatus status) {
         LogEntity logEntity = logRepository.findById(id)
                 .orElseThrow(() -> new EOException(ErrorCodes.ERROR_CODE, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        logEntity.setStatus(status);
+        logEntity.setStatus(status.getName());
         logRepository.save(logEntity);
         return entityToResponseMapper(logEntity);
     }

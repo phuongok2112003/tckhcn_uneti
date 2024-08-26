@@ -10,7 +10,7 @@ public class LogSpecification {
             if (status == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("log_status"), status);
+            return criteriaBuilder.equal(root.get("logStatus"), status.getName());
         };
     }
 }
