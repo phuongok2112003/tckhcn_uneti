@@ -18,7 +18,7 @@ public class LogSpecification {
             if (cat == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("category"), cat);
+           return criteriaBuilder.like(criteriaBuilder.lower(root.get("category")),"%"+cat+"%");
         };
     }
 }
