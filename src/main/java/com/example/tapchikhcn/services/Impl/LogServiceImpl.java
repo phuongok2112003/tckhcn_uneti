@@ -45,6 +45,9 @@ public class LogServiceImpl implements LogService {
         if (search.getStatus() != null) {
             spec = spec.and(LogSpecification.searchStatus(search.getStatus()));
         }
+        if (search.getCat() != null) {
+            spec = spec.and(LogSpecification.searchCat(search.getCat()));
+        }
 
         Page<LogEntity> entityList = logRepository.findAll(spec, pageable);
         List<LogResponseDto> postResponseDtos = entityList.stream()

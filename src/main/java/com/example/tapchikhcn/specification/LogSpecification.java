@@ -13,4 +13,12 @@ public class LogSpecification {
             return criteriaBuilder.equal(root.get("logStatus"), status.getName());
         };
     }
+    public static Specification<LogEntity> searchCat(String cat) {
+        return (root, query, criteriaBuilder) -> {
+            if (cat == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("category"), cat);
+        };
+    }
 }

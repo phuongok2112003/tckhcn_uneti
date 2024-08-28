@@ -14,4 +14,5 @@ import java.util.Date;
 public class LogSearch extends SearchDto{
     private int id;
     private LogStatus status;
+    private String cat;
 }
